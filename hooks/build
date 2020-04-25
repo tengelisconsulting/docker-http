@@ -1,0 +1,4 @@
+#!/bin/bash
+
+docker build -t tengelisconsulting/docker-http-server ./server
+docker build -t tengelisconsulting/docker-http-worker ./worker

@@ -9,8 +9,16 @@ local WORK_PORT = os.getenv("WORK_PORT")
 local HOOK_KEY_S = os.getenv("HOOK_KEY")
 local HOOK_KEY = ngx.decode_base64(HOOK_KEY_S)
 
-zmq_ctx = zmq.context()
+local zmq_ctx = zmq.context()
 
+
+
+local function unauthorized(msg)
+   ngx.status = 401
+   log.err(msg)
+   ngx.say(cjson.encode(msg))
+   ngx.exit(401)
+end
 
 local function handle_build_success(repo_name)
    ngx.req.read_body()
@@ -23,16 +31,21 @@ local function handle_build_success(repo_name)
    local calced_sig_bytes = payload_hmac:final()
    local calced_sig_b64 = ngx.encode_base64(calced_sig_bytes)
    if calced_sig_b64 ~= req_payload_sig_b64 then
-      log.info("unauthorized access")
-      ngx.exit(403)
+      unauthorized("bad signature")
+      return
+   end
+   local payload_data = cjson.decode(req_payload)
+   local req_ts = payload_data.req_ts
+   if math.abs(os.time() - req_ts) > 60 then
+      unauthorized("bad timestamp")
       return
    end
    local client = zmq_ctx:socket{
-      zmq.PUSH,
-      connect = "tcp://localhost:9999"
+      zmq.REQ,
+      connect = string.format("tcp://127.0.0.1:%s", WORK_PORT)
    }
-   client:send_all({"update", repo_name})
-   client:close(0)
+   client:send_all({"restart_webapp", repo_name})
+   client:close()
    ngx.say(cjson.encode({
                  success = repo_name,
    }))

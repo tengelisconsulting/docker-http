@@ -1,30 +1,36 @@
 #!/bin/sh
 
-IMAGE_VSN="staging-latest"
+echo "WORKING!!!"
 
-IMAGE_NAME="galleri/webapp"
-CONTAINER_PREFIX="galleri_port_"
+curl 127.0.0.1:8888
 
-stop() {
-    PORT="${1}"
-    docker stop ${CONTAINER_PREFIX}${PORT}
-}
+docker run --net=host -d nginx:1.17-alpine
 
-start() {
-    PORT="${1}"
-    docker run -d \
-           --rm \
-           --net=host \
-           -e PORT=${PORT} \
-           --name ${CONTAINER_PREFIX}${PORT} \
-           ${IMAGE_NAME}:${IMAGE_VSN}
-}
+# IMAGE_VSN="staging-latest"
 
-main(){
-    stop 5003 \
-        && start 5003 \
-        && stop 5004 \
-        && start 5004
-}
+# IMAGE_NAME="galleri/webapp"
+# CONTAINER_PREFIX="galleri_port_"
 
-main
+# stop() {
+#     PORT="${1}"
+#     docker stop ${CONTAINER_PREFIX}${PORT}
+# }
+
+# start() {
+#     PORT="${1}"
+#     docker run -d \
+#            --rm \
+#            --net=host \
+#            -e PORT=${PORT} \
+#            --name ${CONTAINER_PREFIX}${PORT} \
+#            ${IMAGE_NAME}:${IMAGE_VSN}
+# }
+
+# main(){
+#     stop 5003 \
+#         && start 5003 \
+#         && stop 5004 \
+#         && start 5004
+# }
+
+# main

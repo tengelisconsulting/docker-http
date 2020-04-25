@@ -1,0 +1,13 @@
+version: "3.4"
+services:
+
+  docker-http:
+    image: tengelisconsulting/docker-http:latest
+    network_mode: "host"
+    environment:
+      - PORT
+      - HOOK_KEY
+      - WORK_PORT
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock"

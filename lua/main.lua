@@ -1,15 +1,16 @@
 local cjson = require "cjson"
 local hmac = require "resty.openssl.hmac"
-local shell = require "resty.shell"
+
+local zmq = require "lzmq"
 
 local log = require "lua/log"
 
+local WORK_PORT = os.getenv("WORK_PORT")
 local HOOK_KEY_S = os.getenv("HOOK_KEY")
 local HOOK_KEY = ngx.decode_base64(HOOK_KEY_S)
 
-                -- local timeout = 1000
-                -- local max_size = 4096
-                -- shell.run([[/app/scripts/load_latest_galleri_webapp.sh]])
+zmq_ctx = zmq.context()
+
 
 local function handle_build_success(repo_name)
    ngx.req.read_body()
@@ -26,14 +27,18 @@ local function handle_build_success(repo_name)
       ngx.exit(403)
       return
    end
+   local client = zmq_ctx:socket{
+      zmq.PUSH,
+      connect = "tcp://localhost:9999"
+   }
+   client:send_all({"update", repo_name})
+   client:close(0)
    ngx.say(cjson.encode({
                  success = repo_name,
    }))
 end
 
+
 local M = {}
 M.handle_build_success = handle_build_success
 return M
-
-
--- # shell.run([[/app/scripts/load_latest_galleri_webapp.sh]], "", timeout, max_size)

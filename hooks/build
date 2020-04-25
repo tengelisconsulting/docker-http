@@ -2,3 +2,5 @@
 
 docker build -t tengelisconsulting/docker-http-server ./server
 docker build -t tengelisconsulting/docker-http-worker ./worker
+
+docker build -t tengelisconsulting/docker-http .

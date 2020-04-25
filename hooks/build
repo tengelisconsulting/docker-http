@@ -1,6 +1,8 @@
 #!/bin/bash
 
-docker build -t tengelisconsulting/docker-http-server ./server
-docker build -t tengelisconsulting/docker-http-worker ./worker
+docker build -t tengelisconsulting/docker-http-server:latest ./server
+docker push tengelisconsulting/docker-http-server:latest
+docker build -t tengelisconsulting/docker-http-worker:latest ./worker
+docker push tengelisconsulting/docker-http-worker:latest
 
 docker build -t tengelisconsulting/docker-http .

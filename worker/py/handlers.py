@@ -1,13 +1,14 @@
 import webapps
-
-
+from webapps import ContainerConf
 
 
 HANDLER_MAP = {
     b"restart_webapp": lambda webapp_name: webapps.restart_webapp_service(
-        "galleri/webapp",
-        "galleri_webapp_test",
-        "staging-latest",
-        [5000, 6000]
+        ContainerConf(
+            image_name = "galleri/webapp",
+            container_name = "galleri_webapp",
+            vsn = "staging-latest",
+            ports =[5000, 6000],
+        )
     )
 }

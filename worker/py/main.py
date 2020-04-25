@@ -47,7 +47,6 @@ async def handle_loop()-> None:
     app = init()
     while True:
         msg = await app.work_endpoint.recv_multipart()
-        logging.info("msg %s", msg)
         return_addr, padding, work = None, None, None
         try:
             return_addr = msg[0]

@@ -1,18 +1,15 @@
 import logging
 import os
 from types import SimpleNamespace
+from typing import Dict
 
+import yaml
 import zmq
 import zmq.asyncio
 
+from apptypes import App
 from env import ENV
-
-
-class App(SimpleNamespace):
-    ctx: zmq.asyncio.Context
-    # con_timeout_s: int
-    work_endpoint: zmq.asyncio.Socket
-    work_addr: str
+from services import load_service_conf
 
 
 def reconnect(app: App)-> App:
@@ -29,6 +26,7 @@ def init()-> App:
     app = App(
         ctx = zmq.asyncio.Context(),
         con_timeout_s = 0,
+        services = load_service_conf(),
         work_endpoint = None,
         work_addr = f"tcp://*:{ENV.WORK_PORT}",
     )

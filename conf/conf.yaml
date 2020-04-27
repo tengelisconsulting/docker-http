@@ -1,0 +1,9 @@
+services:
+  # service name is container prefix
+
+  galleri_webapp:
+    image: galleri/webapp
+    tag: staging-latest
+    ports:
+      - 5003
+      - 5004

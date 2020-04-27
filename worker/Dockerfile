@@ -5,6 +5,9 @@ RUN apk --update --no-cache add \
         py-zmq \
         docker
 
+RUN python3 -m pip install \
+        PyYAML==5.3.1
+
 WORKDIR /app
 
 COPY ./py ./py

@@ -33,17 +33,20 @@ def setup_logging(identifier="")-> None:
     )
 
 
-async def handle(work: Tuple[str])-> None:
+async def handle(
+        app: App,
+        work: Tuple[str]
+)-> None:
     logging.info("work: %s", work)
     action = work[0]
     if action not in HANDLER_MAP:
         logging.error("unknown action: %s", action)
         return
-    HANDLER_MAP[action](work[1:])
+    HANDLER_MAP[action](app, work[1:])
     return
 
 
-async def handle_loop()-> None:
+async def async_main()-> None:
     app = init()
     while True:
         msg = await app.work_endpoint.recv_multipart()
@@ -56,14 +59,14 @@ async def handle_loop()-> None:
         except Exception as e:
             logging.exception("bad msg: %s - %s", msg, e)
         try:
-            await handle(work)
+            await handle(app, work)
         except Exception as e:
             logging.exception("handler died: %s", e)
 
 
 def main():
     setup_logging()
-    asyncio.run(handle_loop())
+    asyncio.run(async_main())
 
 
 if __name__ == "__main__":

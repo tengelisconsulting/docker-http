@@ -35,6 +35,7 @@ local function handle_build_success(repo_name)
       return
    end
    local payload_data = cjson.decode(req_payload)
+   local action = payload_data.action
    local req_ts = payload_data.req_ts
    if math.abs(os.time() - req_ts) > 60 then
       unauthorized("bad timestamp")
@@ -44,7 +45,7 @@ local function handle_build_success(repo_name)
       zmq.REQ,
       connect = string.format("tcp://127.0.0.1:%s", WORK_PORT)
    }
-   client:send_all({"restart_webapp", repo_name})
+   client:send_all({action, repo_name})
    client:close()
    ngx.say(cjson.encode({
                  success = repo_name,

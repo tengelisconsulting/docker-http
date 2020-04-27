@@ -31,6 +31,12 @@ def restart_service(conf: ContainerConf)-> None:
         start_service(conf, i)
 
 
+def ensure_latest(conf: ContainerConf)-> None:
+    subprocess.run([
+        "docker", "pull", f"{conf.image_name}:{conf.tag}"
+    ])
+
+
 def start_service(
         conf: ContainerConf,
         instance: int

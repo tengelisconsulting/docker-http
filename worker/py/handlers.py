@@ -10,7 +10,9 @@ def restart_service(
 )-> None:
     service_name = frames[0].decode("utf-8")
     assert service_name in app.services
-    services.restart_service(app.services[service_name])
+    conf = app.services[service_name]
+    services.ensure_latest(conf)
+    services.restart_service(conf)
     return
 
 

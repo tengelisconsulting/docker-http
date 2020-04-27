@@ -38,7 +38,7 @@ local function handle_build_success(repo_name)
    local action = payload_data.action
    local req_ts = payload_data.req_ts
    if math.abs(os.time() - req_ts) > 60 then
-      unauthorized("bad timestamp")
+      unauthorized(string.format("bad timestamp - %s", req_ts))
       return
    end
    local client = zmq_ctx:socket{

@@ -1,5 +1,5 @@
 services:
-  # service name is container prefix
+  # service name is container prefix.  ex:
 
   galleri_webapp:
     image: galleri/webapp

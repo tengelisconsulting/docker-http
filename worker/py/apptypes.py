@@ -6,7 +6,7 @@ from typing import NamedTuple
 import zmq.asyncio
 
 
-class ContainerConf(NamedTuple):
+class WebContainerConf(NamedTuple):
     image_name: str
     container_prefix: str
     tag: str
@@ -16,6 +16,6 @@ class ContainerConf(NamedTuple):
 class App(SimpleNamespace):
     ctx: zmq.asyncio.Context
     # con_timeout_s: int
-    services: Dict[str, ContainerConf]
+    services: Dict[str, WebContainerConf]
     work_endpoint: zmq.asyncio.Socket
     work_addr: str

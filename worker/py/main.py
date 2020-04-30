@@ -3,6 +3,7 @@
 import asyncio
 import logging
 import time
+from typing import cast
 from typing import Tuple
 
 from app import App
@@ -18,11 +19,8 @@ def setup_logging(identifier="")-> None:
             "INFO": logging.INFO,
             "ERROR": logging.ERROR
         }
-        env_log_level = os.environ.get("LOG_LEVEL")
-        try:
-            return env_log_level_map[env_log_level]
-        except:
-            return logging.INFO
+        env_log_level = os.environ.get("LOG_LEVEL", "INFO")
+        return env_log_level_map[env_log_level]
     for handler in logging.root.handlers[:]:
         logging.root.removeHandler(handler)
     logging.basicConfig(
@@ -35,14 +33,15 @@ def setup_logging(identifier="")-> None:
 
 async def handle(
         app: App,
-        work: Tuple[str]
+        work: Tuple[bytes]
 )-> None:
     logging.info("work: %s", work)
     action = work[0]
+    ds_work = cast(Tuple[bytes], work[1:])
     if action not in HANDLER_MAP:
         logging.error("unknown action: %s", action)
         return
-    HANDLER_MAP[action](app, work[1:])
+    HANDLER_MAP[action](app, ds_work)
     return
 
 
@@ -50,12 +49,15 @@ async def async_main()-> None:
     app = init()
     while True:
         msg = await app.work_endpoint.recv_multipart()
-        return_addr, padding, work = None, None, None
+        return_addr, padding = None, None
+        work: Tuple[bytes]
         try:
             return_addr = msg[0]
             padding = msg[1]
             assert padding == b""
-            work = tuple(msg[2:])
+            work = cast(Tuple[bytes],
+                        tuple(msg[2:]))
+
         except Exception as e:
             logging.exception("bad msg: %s - %s", msg, e)
         try:

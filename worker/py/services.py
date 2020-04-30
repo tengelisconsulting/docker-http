@@ -5,18 +5,18 @@ from typing import Dict
 
 import yaml
 
-from apptypes import ContainerConf
+from apptypes import WebContainerConf
 from env import ENV
 
 
-def load_service_conf()-> Dict[str, ContainerConf]:
+def load_service_conf()-> Dict[str, WebContainerConf]:
     with open("/srv/conf/conf.yaml") as conf_f:
         all_conf = yaml.safe_load(conf_f)
         all_service_conf = all_conf["services"]
         conf = {}
         for service_name in all_service_conf:
             service_conf = all_service_conf[service_name]
-            conf[service_name] = ContainerConf(
+            conf[service_name] = WebContainerConf(
                 image_name = service_conf["image"],
                 container_prefix = service_name,
                 tag = service_conf["tag"],
@@ -25,20 +25,20 @@ def load_service_conf()-> Dict[str, ContainerConf]:
         return conf
 
 
-def restart_service(conf: ContainerConf)-> None:
+def restart_service(conf: WebContainerConf)-> None:
     for i in range(0, len(conf.ports)):
         stop_service(conf, i)
         start_service(conf, i)
 
 
-def ensure_latest(conf: ContainerConf)-> None:
+def ensure_latest(conf: WebContainerConf)-> None:
     subprocess.run([
         "docker", "pull", f"{conf.image_name}:{conf.tag}"
     ])
 
 
 def start_service(
-        conf: ContainerConf,
+        conf: WebContainerConf,
         instance: int
 )-> None:
     port = conf.ports[instance]
@@ -52,7 +52,7 @@ def start_service(
 
 
 def stop_service(
-        conf: ContainerConf,
+        conf: WebContainerConf,
         instance: int
 )-> None:
     port = conf.ports[instance]

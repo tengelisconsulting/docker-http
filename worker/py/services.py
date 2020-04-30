@@ -14,6 +14,8 @@ def load_service_conf()-> Dict[str, WebContainerConf]:
         all_conf = yaml.safe_load(conf_f)
         all_service_conf = all_conf["services"]
         conf = {}
+        if not all_service_conf:
+            return {}
         for service_name in all_service_conf:
             service_conf = all_service_conf[service_name]
             conf[service_name] = WebContainerConf(

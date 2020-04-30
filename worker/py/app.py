@@ -8,6 +8,7 @@ import zmq
 import zmq.asyncio
 
 from apptypes import App
+from compose_services import get_compose_services
 from env import ENV
 from services import load_service_conf
 
@@ -24,8 +25,9 @@ def reconnect(app: App)-> App:
 
 def init()-> App:
     app = App(
+        compose_services = get_compose_services(),
         ctx = zmq.asyncio.Context(),
-        con_timeout_s = 0,
+        # con_timeout_s = 0,
         services = load_service_conf(),
         work_endpoint = None,
         work_addr = f"tcp://*:{ENV.WORK_PORT}",

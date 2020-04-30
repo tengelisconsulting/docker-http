@@ -33,15 +33,14 @@ def setup_logging(identifier="")-> None:
 
 async def handle(
         app: App,
-        work: Tuple[bytes]
+        work: Tuple[bytes, ...]
 )-> None:
     logging.info("work: %s", work)
     action = work[0]
-    ds_work = cast(Tuple[bytes], work[1:])
     if action not in HANDLER_MAP:
         logging.error("unknown action: %s", action)
         return
-    HANDLER_MAP[action](app, ds_work)
+    HANDLER_MAP[action](app, work[1:])
     return
 
 
@@ -50,14 +49,12 @@ async def async_main()-> None:
     while True:
         msg = await app.work_endpoint.recv_multipart()
         return_addr, padding = None, None
-        work: Tuple[bytes]
+        work: Tuple[bytes, ...]
         try:
             return_addr = msg[0]
             padding = msg[1]
             assert padding == b""
-            work = cast(Tuple[bytes],
-                        tuple(msg[2:]))
-
+            work = tuple(msg[2:])
         except Exception as e:
             logging.exception("bad msg: %s - %s", msg, e)
         try:

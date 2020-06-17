@@ -11,13 +11,21 @@ on_url_match() {
 }
 
 
-test_handler() {
-    echo "this is the test handler"
-    sleep 2
-    echo "done my work"
+update_onward() {
+    echo "UPDATING ONWARD BACKEND"
+    cd /home/liam/projects/onward/backend
+    git pull \
+        && source ./env/prod.env \
+        && docker-compose pull \
+        && echo "y" | docker system prune \
+        && docker-compose down --remove-orphans \
+        && docker-compose up -d
+
 }
 
+
 while true; do
+    echo "listening for work..."
     input=$(nc -l -p ${LOCAL_HOOK_PORT})
-    on_url_match $input "/test" test_handler
+    on_url_match $input "/build-success/onward" update_onward
 done

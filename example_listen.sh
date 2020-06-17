@@ -16,7 +16,7 @@ update_onward() {
     cleanup() {
         rm -f "${LOCKFILE}"
     }
-    trap cleanup ERR
+    trap cleanup SIGINT SIGTERM EXIT ERR
     if [[ -f "${LOCKFILE}" ]]; then
         echo "ONWARD UPDATE IN PROGRESS, WILL NOT ATTEMPT"
         return

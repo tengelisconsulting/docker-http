@@ -12,6 +12,7 @@ on_url_match() {
 
 
 update_onward() {
+    ONWARD_HOME="/home/liam/projects/onward/backend"
     LOCKFILE="/tmp/onward.lock"
     cleanup() {
         rm -f "${LOCKFILE}"
@@ -23,7 +24,7 @@ update_onward() {
     fi
     touch "${LOCKFILE}"
     echo "UPDATING ONWARD BACKEND"
-    cd /home/liam/projects/onward/backend
+    cd ${ONWARD_HOME}
     git pull \
         && source ./env/prod.env \
         && docker-compose pull \

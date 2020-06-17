@@ -8,18 +8,6 @@ services:
       - PORT
       - HOOK_KEY
       - WORK_PORT
+      - LOCAL_HOOK_PORT
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
-
-  worker:
-    image: tengelisconsulting/docker-http-worker:latest
-    network_mode: "host"
-    environment:
-      - HOOK_KEY
-      - WORK_PORT
-      - SERVICES
-    volumes:
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - "./conf:/srv/conf"
-      - "./compose_configs:/srv/compose_configs"

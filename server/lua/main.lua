@@ -1,16 +1,11 @@
 local cjson = require "cjson"
 local hmac = require "resty.openssl.hmac"
 
-local zmq = require "lzmq"
-
 local log = require "lua/log"
 
-local WORK_PORT = os.getenv("WORK_PORT")
+local LOCAL_HOOK_PORT = tonumber(os.getenv("LOCAL_HOOK_PORT"))
 local HOOK_KEY_S = os.getenv("HOOK_KEY")
 local HOOK_KEY = ngx.decode_base64(HOOK_KEY_S)
-
-local zmq_ctx = zmq.context()
-
 
 
 local function unauthorized(msg)
@@ -20,9 +15,7 @@ local function unauthorized(msg)
    ngx.exit(401)
 end
 
-local function handle_build_success(repo_name)
-   ngx.req.read_body()
-   local data = cjson.decode(ngx.req.get_body_data())
+local function verify(data)
    local digest_algo = data.digest_algo
    local req_payload = data.payload
    local req_payload_sig_b64 = data.payload_signed_b64
@@ -35,24 +28,27 @@ local function handle_build_success(repo_name)
       return
    end
    local payload_data = cjson.decode(req_payload)
-   local action = payload_data.action
    local req_ts = payload_data.req_ts
    if math.abs(os.time() - req_ts) > 60 then
       unauthorized(string.format("bad timestamp - %s", req_ts))
       return
    end
-   local client = zmq_ctx:socket{
-      zmq.REQ,
-      connect = string.format("tcp://127.0.0.1:%s", WORK_PORT)
-   }
-   client:send_all({action, repo_name})
-   client:close()
-   ngx.say(cjson.encode({
-                 success = repo_name,
-   }))
 end
 
-
 local M = {}
-M.handle_build_success = handle_build_success
+
+function M.main()
+   ngx.req.read_body()
+   local body = ngx.req.get_body_data()
+   if not body then
+      unauthorized("no body")
+   end
+   local data = cjson.decode(body)
+   verify(data)
+   local socket = ngx.socket.tcp()
+   local ok, err = socket:connect("127.0.0.1", LOCAL_HOOK_PORT)
+   local ok, err = socket:send(ngx.var.request_uri)
+   socket:close()
+end
+
 return M

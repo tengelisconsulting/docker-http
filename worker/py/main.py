@@ -2,8 +2,6 @@
 
 import asyncio
 import logging
-import time
-from typing import cast
 from typing import Tuple
 
 from app import App
@@ -12,8 +10,8 @@ from handlers import HANDLER_MAP
 import os
 
 
-def setup_logging(identifier="")-> None:
-    def get_log_level()-> int:
+def setup_logging(identifier="") -> None:
+    def get_log_level() -> int:
         env_log_level_map = {
             "DEBUG": logging.DEBUG,
             "INFO": logging.INFO,
@@ -34,7 +32,7 @@ def setup_logging(identifier="")-> None:
 async def handle(
         app: App,
         work: Tuple[bytes, ...]
-)-> None:
+) -> None:
     logging.info("work: %s", work)
     action = work[0]
     if action not in HANDLER_MAP:
@@ -44,14 +42,14 @@ async def handle(
     return
 
 
-async def async_main()-> None:
+async def async_main() -> None:
     app = init()
     while True:
         msg = await app.work_endpoint.recv_multipart()
-        return_addr, padding = None, None
+        padding = None
         work: Tuple[bytes, ...]
         try:
-            return_addr = msg[0]
+            # return_addr = msg[0]
             padding = msg[1]
             assert padding == b""
             work = tuple(msg[2:])

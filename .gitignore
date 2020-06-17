@@ -6,3 +6,5 @@ compose_configs/
 
 conf/*
 !conf/example_conf.yaml
+
+listen.sh

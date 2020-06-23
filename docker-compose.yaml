@@ -7,7 +7,6 @@ services:
     environment:
       - PORT
       - HOOK_KEY
-      - WORK_PORT
       - LOCAL_HOOK_PORT
     volumes:
       - "/etc/localtime:/etc/localtime:ro"

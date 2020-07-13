@@ -15,7 +15,17 @@ local function unauthorized(msg)
    ngx.exit(401)
 end
 
-local function verify(data)
+
+local M = {}
+
+function M.verify()
+   ngx.req.read_body()
+   local body = ngx.req.get_body_data()
+   if not body then
+      unauthorized("no body")
+   end
+   local data = cjson.decode(body)
+   verify(data)
    local digest_algo = data.digest_algo
    local req_payload = data.payload
    local req_payload_sig_b64 = data.payload_signed_b64
@@ -33,22 +43,6 @@ local function verify(data)
       unauthorized(string.format("bad timestamp - %s", req_ts))
       return
    end
-end
-
-local M = {}
-
-function M.main()
-   ngx.req.read_body()
-   local body = ngx.req.get_body_data()
-   if not body then
-      unauthorized("no body")
-   end
-   local data = cjson.decode(body)
-   verify(data)
-   local socket = ngx.socket.tcp()
-   local ok, err = socket:connect("127.0.0.1", LOCAL_HOOK_PORT)
-   local ok, err = socket:send(ngx.var.request_uri)
-   socket:close()
 end
 
 return M

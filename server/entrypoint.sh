@@ -13,6 +13,7 @@ main() {
 
     cp nginx/nginx.template.conf nginx/nginx.conf
     env_sub PORT
+    env_sub LOCAL_HOOK_PORT
 
     openresty -p `pwd`/ -c nginx/nginx.conf
 

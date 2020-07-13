@@ -25,7 +25,7 @@ function M.verify()
       unauthorized("no body")
    end
    local data = cjson.decode(body)
-   verify(data)
+
    local digest_algo = data.digest_algo
    local req_payload = data.payload
    local req_payload_sig_b64 = data.payload_signed_b64
